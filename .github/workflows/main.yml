@@ -37,6 +37,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
+          if [ -n "$RELEASE_TAG" ]; then
+            gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json tagName > /dev/null
+          fi
           sha=$(scripts/resolve-release-ref.sh "$RELEASE_TAG")
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
 

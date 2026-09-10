@@ -20,5 +20,4 @@ if [ "$tag" != "@zgeoff/slooks@$version" ]; then
   exit 1
 fi
 
-gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json tagName >/dev/null
 printf '%s\n' "$sha"
