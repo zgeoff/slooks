@@ -27,12 +27,26 @@ slooks send / react / edit ──> PreAction hooks ──> Slack ──> PostAct
 
 ## Install
 
+Homebrew:
+
+```sh
+brew install zgeoff/tap/slooks
+```
+
+Or download a binary:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/zgeoff/slooks/main/install.sh | sh
+```
+
+Prebuilt binaries cover macOS and Linux, arm64 and x64. The install script puts `slooks` in
+`~/.local/bin`; set `SLOOKS_INSTALL_DIR` to change that. Checksums are on the
+[releases page](https://github.com/zgeoff/slooks/releases).
+
 From source, with [Bun](https://bun.sh):
 
 ```sh
-git clone https://github.com/zgeoff/slooks && cd slooks
-bun install
-ln -s "$PWD/bin/slooks" ~/.local/bin/slooks
+bun add -g @zgeoff/slooks
 ```
 
 slooks needs a Slack app with Socket Mode on and user scopes only. The

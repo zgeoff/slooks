@@ -10,6 +10,7 @@ Usage:
   slooks edit <channel> <ts> [text]      Edit one of your messages
   slooks thread <channel> <ts> [--json]  Print a thread (parent first)
   slooks help
+  slooks --version
 
 <channel> is a channel id (C…, D…, G…) or #name.
 Tokens: SLACK_APP_TOKEN (xapp-) and SLACK_USER_TOKEN (xoxp-), or "appToken" / "userToken" in
