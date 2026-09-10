@@ -14,3 +14,8 @@ export function main(): void {
     },
   );
 }
+
+// The compiled binary's entry; `bin/slooks` calls main() itself.
+if (import.meta.main) {
+  main();
+}

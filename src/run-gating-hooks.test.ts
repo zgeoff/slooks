@@ -70,4 +70,18 @@ describe('runGatingHooks', () => {
 
     expect(verdict.blocked).toBe(false);
   });
+
+  test('a child that outlives the hook does not hold the gate open', async () => {
+    const started = Date.now();
+    const verdict = await runGatingHooks([entry('sleep 5 & wait', { timeout: 100 })], event, action);
+
+    expect(verdict.blocked).toBe(false);
+    expect(Date.now() - started).toBeLessThan(2000);
+  });
+
+  test('output written before exit is kept when a child holds the pipe', async () => {
+    const verdict = await runGatingHooks([entry('sleep 5 & echo \'{"text":"kept"}\'; exit 0')], event, action);
+
+    expect(verdict).toEqual({ blocked: false, action: { ...action, text: 'kept' } });
+  });
 });

@@ -1,5 +1,5 @@
 {
-  "name": "slooks",
+  "name": "@zgeoff/slooks",
   "version": "0.1.0",
   "description": "Slack hooks daemon: run shell commands on Slack events, as you",
   "license": "MIT",
@@ -10,12 +10,18 @@
     "url": "git+https://github.com/zgeoff/slooks.git"
   },
   "type": "module",
-  "private": true,
   "bin": {
     "slooks": "bin/slooks"
   },
+  "files": [
+    "bin",
+    "src",
+    "!src/**/*.test.ts"
+  ],
   "scripts": {
     "start": "bun bin/slooks daemon",
+    "build:binaries": "bash scripts/build-binaries.sh",
+    "audit": "bun audit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "bun test"
   },

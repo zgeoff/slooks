@@ -1,3 +1,4 @@
+import pkg from '../package.json' with { type: 'json' };
 import { buildWebClient } from './build-web-client.ts';
 import { getPaths } from './get-paths.ts';
 import { loadConfig } from './load-config.ts';
@@ -26,6 +27,12 @@ export async function runCLI(argv: readonly string[]): Promise<number> {
       return runActionCommand(command, positional, flags);
     case 'thread':
       return runThread(positional, flags);
+    case 'version':
+    case '--version':
+    case '-v':
+      console.log(pkg.version);
+
+      return 0;
     case 'help':
     case '--help':
     case '-h':
@@ -68,8 +75,24 @@ function parseArgs(args: readonly string[]): ParsedArgs {
 
 async function runEvents(): Promise<number> {
   const { socketFile } = getPaths();
+  const hint = `slooks events: no daemon on ${socketFile}; start one with \`slooks daemon\``;
 
   return new Promise((resolve) => {
+    let settled = false;
+    const settle = (code: number, message?: string): void => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+
+      if (message !== undefined) {
+        console.error(message);
+      }
+
+      resolve(code);
+    };
+
     Bun.connect({
       unix: socketFile,
       socket: {
@@ -77,20 +100,17 @@ async function runEvents(): Promise<number> {
           process.stdout.write(data);
         },
         close() {
-          resolve(0);
+          settle(0);
         },
         error(_socket, error) {
-          console.error(`slooks events: ${error.message}`);
-          resolve(1);
+          settle(1, `slooks events: ${error.message}`);
         },
         connectError() {
-          console.error(`slooks events: no daemon on ${socketFile}; start one with \`slooks daemon\``);
-          resolve(1);
+          settle(1, hint);
         },
       },
     }).catch(() => {
-      console.error(`slooks events: no daemon on ${socketFile}; start one with \`slooks daemon\``);
-      resolve(1);
+      settle(1, hint);
     });
   });
 }
