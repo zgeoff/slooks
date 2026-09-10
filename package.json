@@ -1,0 +1,32 @@
+{
+  "name": "slooks",
+  "version": "0.1.0",
+  "description": "Slack hooks daemon: run shell commands on Slack events, as you",
+  "license": "MIT",
+  "homepage": "https://github.com/zgeoff/slooks#readme",
+  "bugs": "https://github.com/zgeoff/slooks/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zgeoff/slooks.git"
+  },
+  "type": "module",
+  "private": true,
+  "bin": {
+    "slooks": "bin/slooks"
+  },
+  "scripts": {
+    "start": "bun bin/slooks daemon",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@slack/socket-mode": "^2.0.7",
+    "@slack/web-api": "^8.1.1",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@tsconfig/strictest": "^2.0.8",
+    "@types/bun": "latest",
+    "typescript": "^5"
+  }
+}
