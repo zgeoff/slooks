@@ -48,6 +48,13 @@ interface GateOutcome {
   readonly stderr: string;
 }
 
+// After the hook exits, its pipes normally hit EOF at once. A hook that
+// backgrounded a child, or a killed `sh` whose command outlived it (dash
+// does not exec a single command the way bash does), leaves a process
+// holding the pipes open, so the wait for EOF is capped and the gate takes
+// whatever output arrived.
+const PIPE_GRACE_MS = 200;
+
 async function runGate(entry: HookEntry, payload: unknown): Promise<GateOutcome> {
   const proc = Bun.spawn(['/bin/sh', '-c', entry.command], {
     stdin: Buffer.from(`${JSON.stringify(payload)}\n`),
@@ -58,18 +65,35 @@ async function runGate(entry: HookEntry, payload: unknown): Promise<GateOutcome>
   const timer = setTimeout(() => {
     proc.kill();
   }, entry.timeout);
+  const stdout = collectText(proc.stdout);
+  const stderr = collectText(proc.stderr);
 
   try {
-    const [stdout, stderr, code] = await Promise.all([
-      new Response(proc.stdout).text(),
-      new Response(proc.stderr).text(),
-      proc.exited,
-    ]);
+    const code = await proc.exited;
 
-    return { code, stdout, stderr };
+    await Promise.race([Promise.all([stdout.done, stderr.done]), Bun.sleep(PIPE_GRACE_MS)]);
+
+    return { code, stdout: stdout.text(), stderr: stderr.text() };
   } finally {
     clearTimeout(timer);
   }
+}
+
+interface TextCollector {
+  readonly done: Promise<void>;
+  readonly text: () => string;
+}
+
+function collectText(stream: ReadableStream<Uint8Array>): TextCollector {
+  const decoder = new TextDecoder();
+  const chunks: string[] = [];
+  const done = (async () => {
+    for await (const chunk of stream) {
+      chunks.push(decoder.decode(chunk, { stream: true }));
+    }
+  })();
+
+  return { done, text: () => chunks.join('') };
 }
 
 function mergeOverride(action: Action, stdout: string): Action {
