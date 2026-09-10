@@ -4,6 +4,8 @@
 # registry. Every later release is published by .github/workflows/main.yml.
 set -euo pipefail
 
+cd "$(dirname "$0")/.."
+
 name=$(jq -r .name package.json)
 version=$(jq -r .version package.json)
 
@@ -20,7 +22,10 @@ if npm view "$name" version >/dev/null 2>&1; then
 fi
 
 bun install --frozen-lockfile
-bun publish --access public
+pack_dir=$(mktemp -d)
+trap 'rm -rf "$pack_dir"' EXIT
+bun pm pack --destination "$pack_dir"
+npm publish "$pack_dir"/*.tgz --access public
 
 cat <<MSG
 
@@ -33,4 +38,5 @@ Now enable trusted publishing so CI can release future versions:
        repository:           slooks
        workflow filename:    main.yml
        environment:          (leave empty)
+       allowed actions:      allow npm publish
 MSG
