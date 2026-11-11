@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/zgeoff/slooks/compare/@zgeoff/slooks@0.2.0...@zgeoff/slooks@0.2.1) (2026-11-11)
+
+
+### Bug Fixes
+
+* time out Socket Mode API requests so a stalled reconnect retries ([#4](https://github.com/zgeoff/slooks/issues/4)) ([d81d57e](https://github.com/zgeoff/slooks/commit/d81d57ee9f97fd3e49ad944612537b8a32c1429a))
+
 ## [0.2.0](https://github.com/zgeoff/slooks/compare/@zgeoff/slooks@0.1.0...@zgeoff/slooks@0.2.0) (2026-09-10)
 
 
