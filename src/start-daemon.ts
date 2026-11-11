@@ -31,7 +31,10 @@ export async function startDaemon(config: Config, options: DaemonOptions): Promi
   const store = openStore(paths.dbFile);
   const events = startEventsServer(paths.socketFile);
   const runHooks = makeHookRunner(config.hooks);
-  const socket = new SocketModeClient({ appToken: config.appToken });
+  // The Web API client defaults to no request timeout. A reconnect's
+  // `apps.connections.open` sent as the network changes can then never settle,
+  // and the client stops retrying while the process stays up.
+  const socket = new SocketModeClient({ appToken: config.appToken, clientOptions: { timeout: 10_000 } });
 
   const emit = (event: SlooksEvent): void => {
     if (options.verbose) {
